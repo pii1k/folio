@@ -1,0 +1,16 @@
+{
+    // Coding convention
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true,
+    "C_Cpp.formatting": "clangFormat",
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+        "editor.inlayHints.enabled": "off"
+    },
+    "clang-format.executable": "/usr/bin/clang-format",
+    "clang-format.style": "${workspaceFolder}/.clang-format",
+    "clang-format.language.c.enable": true,
+    "clang-format.language.cpp.enable": true,
+}
