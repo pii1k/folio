@@ -48,4 +48,10 @@ private:
     MoveRuntime rt_;
 };
 
+// TODO(jyan): 유틸함수 정리
+static float clampf(float v, float a, float b)
+{
+    return (v < a) ? a : (v > b ? b : v);
+}
+
 } // namespace folio::movement

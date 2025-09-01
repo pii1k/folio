@@ -2,11 +2,6 @@
 
 namespace folio::movement
 {
-static float clampf(float v, float a, float b)
-{
-    return (v < a) ? a : (v > b ? b : v);
-}
-
 void CharacterController::tick(geometry::Transform &transform,
                                const InputState &in,
                                const FixedDelta &dt,
