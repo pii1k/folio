@@ -25,6 +25,10 @@ void DemoGame::init(app::AppContext &ctx)
 
     // camera
     cam_ = sf::View(sf::FloatRect(0, 0, 960, 540));
+
+    // warm up chunks for initial view
+    chunks_->appendVisibleRange(cam_, jobs_);
+    jobs_.drain();
 }
 
 void DemoGame::event(app::AppContext &ctx, const sf::Event &event)

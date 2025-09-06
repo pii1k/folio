@@ -1,4 +1,5 @@
 #pragma once
+
 #include "src/core/input.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window.hpp>

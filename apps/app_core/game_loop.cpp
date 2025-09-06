@@ -38,6 +38,7 @@ void GameLoop::run(Game &game, const TickRates &rates)
 
         game.frameUpdate(ctx, frame);
         game.render(ctx);
+        window_.display();
     }
 
     game.shutdown(ctx);

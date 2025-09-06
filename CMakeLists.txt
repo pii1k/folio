@@ -30,6 +30,7 @@ target_include_directories(folio_world PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # Sfml adapter
 find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
 add_library(folio_adapters_sfml adapters/sfml/sfml_input.cpp)
+target_include_directories(folio_adapters_sfml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(folio_adapters_sfml
 PUBLIC
     sfml-graphics
