@@ -8,6 +8,7 @@
 #include "src/movement/character_controller.hpp"
 #include "src/world/chunks.hpp"
 #include "src/world/tile_map.hpp"
+#include "src/world/iso.hpp"
 #include <memory>
 
 namespace folio::demo
@@ -38,8 +39,10 @@ private:
     world::TileMap map_{};
     std::unique_ptr<world::ChunkCache> chunks_{};
     geometry::AABB world_bounds_{};
+    geometry::AABB iso_bounds_{};
     sf::View cam_{};
     concurrency::JobSystem jobs_{1};
+    world::IsoDims iso_{};
 };
 
 } // namespace folio::demo

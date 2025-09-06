@@ -17,7 +17,10 @@ void DemoGame::init(app::AppContext &ctx)
     const int TS = 32;
     map_ = makeOverworld("overworld", 180, 120, TS);
     world_bounds_ = world::boundsAABB(map_);
+    iso_ = world::IsoDims{float(TS * 2), float(TS)}; // typical diamond w:h = 2:1
+    iso_bounds_ = world::isoMapBounds(map_, iso_);
     chunks_ = std::make_unique<world::ChunkCache>(map_, 32);
+    chunks_->setIsometric(iso_);
 
     // player
     tr_.pos = {TS * 10.f, TS * 10.f};
@@ -46,29 +49,39 @@ void DemoGame::fixedUpdate(app::AppContext &ctx, float dt)
         facing_right_ = input_.facingRight(*ctx.window, tr_.pos.x);
     }
 
-    // move attempt
+    // map screen input to world-space direction for isometric equalized speed
+    geometry::Vec2 screen_dir{(in_.right ? 1.f : 0.f) - (in_.left ? 1.f : 0.f),
+                              (in_.down ? 1.f : 0.f) - (in_.up ? 1.f : 0.f)};
+    screen_dir = geometry::norm(screen_dir);
+    geometry::Vec2 world_dir{0.f, 0.f};
+    if (geometry::len(screen_dir) > 0.f)
+    {
+        const float sx = iso_.w * 0.5f;
+        const float sy = iso_.h * 0.5f;
+        // inverse of iso projection matrix to get world direction from screen vector
+        float fx = 0.5f * (screen_dir.x / sx + screen_dir.y / sy);
+        float fy = 0.5f * (-screen_dir.x / sx + screen_dir.y / sy);
+        world_dir = geometry::norm({fx, fy});
+    }
+
+    // move attempt using isometric-aware direction
     const geometry::Vec2 prev = tr_.pos;
-    ctrl_.tick(tr_, in_, folio::FixedDelta{dt}, world_bounds_);
+    ctrl_.tickIso(tr_, in_, world_dir, folio::FixedDelta{dt}, world_bounds_);
 
     // collision resolve: AABB approx + axis rollback
+    // collision resolve: axis-wise separate (X then Y) to avoid full stop on touch
     geometry::AABB me{tr_.pos.x - tr_.r, tr_.pos.y - tr_.r, tr_.r * 2, tr_.r * 2};
-    bool hit = anyHit(me);
-    if (hit)
+    // resolve X
+    geometry::AABB meX{tr_.pos.x - tr_.r, prev.y - tr_.r, tr_.r * 2, tr_.r * 2};
+    if (anyHit(meX))
     {
         tr_.pos.x = prev.x;
-        me.x = tr_.pos.x - tr_.r;
-        bool hitX = anyHit(me);
-        if (hitX)
-        {
-            tr_.pos = prev;
-            me.x = tr_.pos.x - tr_.r;
-            me.y = tr_.pos.y - tr_.r;
-        }
-        else
-        {
-            tr_.pos.y = prev.y;
-            me.y = tr_.pos.y - tr_.r;
-        }
+    }
+    // resolve Y with possibly corrected X
+    geometry::AABB meY{tr_.pos.x - tr_.r, tr_.pos.y - tr_.r, tr_.r * 2, tr_.r * 2};
+    if (anyHit(meY))
+    {
+        tr_.pos.y = prev.y;
     }
 
     // prepare chunks
@@ -79,10 +92,12 @@ void DemoGame::fixedUpdate(app::AppContext &ctx, float dt)
 void DemoGame::frameUpdate(app::AppContext &ctx, float ft)
 {
     (void)ft;
+    // camera follows player in isometric space and clamps to iso map bounds
+    const auto isoPos = world::worldToIso(tr_.pos.x, tr_.pos.y, map_.tile_size, iso_);
     const float hw = cam_.getSize().x * 0.5f;
     const float hh = cam_.getSize().y * 0.5f;
-    const float cx = clampf(tr_.pos.x, world_bounds_.x + hw, world_bounds_.x + world_bounds_.w - hw);
-    const float cy = clampf(tr_.pos.y, world_bounds_.y + hh, world_bounds_.y + world_bounds_.h - hh);
+    const float cx = clampf(isoPos.x, iso_bounds_.x + hw, iso_bounds_.x + iso_bounds_.w - hw);
+    const float cy = clampf(isoPos.y, iso_bounds_.y + hh, iso_bounds_.y + iso_bounds_.h - hh);
     cam_.setCenter(cx, cy);
 }
 
@@ -96,9 +111,11 @@ void DemoGame::render(app::AppContext &ctx)
     chunks_->drawVisible(win, cam_);
 
     // player
+    // draw player at projected isometric position
+    const auto ip = world::worldToIso(tr_.pos.x, tr_.pos.y, map_.tile_size, iso_);
     sf::CircleShape pc(tr_.r, 18);
     pc.setOrigin(tr_.r, tr_.r);
-    pc.setPosition(tr_.pos.x, tr_.pos.y);
+    pc.setPosition(ip.x, ip.y);
     pc.setFillColor(sf::Color(100, 200, 255));
     win.draw(pc);
 

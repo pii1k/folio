@@ -44,4 +44,35 @@ void CharacterController::tick(geometry::Transform &transform,
                              bounds.y + bounds.h - transform.r);
 }
 
+void CharacterController::tickIso(geometry::Transform &transform,
+                                  const core::InputState &in,
+                                  const geometry::Vec2 &world_dir,
+                                  const FixedDelta &dt,
+                                  const geometry::AABB &bounds)
+{
+    // provided direction (world space)
+    geometry::Vec2 direction = norm(world_dir);
+
+    // dash begin
+    if (in.dash && this->rt_.dash_remain <= 0.f && this->rt_.stamina >= p_.dash_cost)
+    {
+        this->rt_.dash_remain = p_.dash_time;
+        this->rt_.stamina -= p_.dash_cost;
+        if (len(direction) < 0.1f)
+        {
+            direction = geometry::Vec2{1.f, 0.f};
+        }
+    }
+
+    const float speed = (this->rt_.dash_remain > 0.f) ? p_.dash_speed : p_.walk_speed;
+    transform.pos += direction * (speed * dt.sec);
+
+    if (this->rt_.dash_remain > 0.f)
+        this->rt_.dash_remain -= dt.sec;
+
+    // clamp to bounds
+    transform.pos.x = clampf(transform.pos.x, bounds.x + transform.r, bounds.x + bounds.w - transform.r);
+    transform.pos.y = clampf(transform.pos.y, bounds.y + transform.r, bounds.y + bounds.h - transform.r);
+}
+
 } // namespace folio::movement

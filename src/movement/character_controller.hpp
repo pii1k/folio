@@ -37,6 +37,13 @@ public:
               const FixedDelta &dt,
               const geometry::AABB &bounds);
 
+    // Isometric or custom control: supply world-space direction directly
+    void tickIso(geometry::Transform &tr,
+                 const core::InputState &in,
+                 const geometry::Vec2 &world_dir,
+                 const FixedDelta &dt,
+                 const geometry::AABB &bounds);
+
     const MoveRuntime &runtime() const { return rt_; }
 
 private:
