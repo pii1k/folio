@@ -1,5 +1,11 @@
 #pragma once
 #include <SFML/Window/Event.hpp>
+#include <string>
+
+namespace sf
+{
+class RenderWindow;
+}
 
 namespace folio::app
 {
@@ -21,6 +27,7 @@ struct Config
 struct AppContext
 {
     // TODO(jyan): 필요시 입력, 렌더러, 오디오 핸들 등 추가
+    sf::RenderWindow *window{nullptr};
 };
 
 class Game
@@ -31,7 +38,7 @@ public:
     virtual void event(AppContext &ctx, const sf::Event &event) = 0;
     virtual void fixedUpdate(AppContext &ctx, float dt) = 0;
     virtual void frameUpdate(AppContext &ctx, float ft) = 0;
-    virtual void renderder(AppContext &ctx) = 0;
+    virtual void render(AppContext &ctx) = 0;
     virtual void shutdown(AppContext &ctx) = 0;
 };
 } // namespace folio::app

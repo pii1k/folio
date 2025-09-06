@@ -1,9 +1,10 @@
 #include "character_controller.hpp"
+#include "src/core/utilities.hpp"
 
 namespace folio::movement
 {
 void CharacterController::tick(geometry::Transform &transform,
-                               const InputState &in,
+                               const core::InputState &in,
                                const FixedDelta &dt,
                                const geometry::AABB &bounds)
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "game/geometry/types.hpp"
 #include "tile_map.hpp"
 #include <unordered_map>
 

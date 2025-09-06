@@ -1,16 +1,12 @@
 #pragma once
 
-#include "game/core/time.hpp"
-#include "game/geometry/types.hpp"
+#include "src/core/time.hpp"
+#include "src/core/input.hpp"
+#include "src/geometry/types.hpp"
 
 namespace folio::movement
 {
 
-struct InputState
-{
-    bool up, down, left, right = false;
-    bool dash = false;
-};
 
 struct MoveParams
 {
@@ -37,7 +33,7 @@ public:
     }
 
     void tick(geometry::Transform &tr,
-              const InputState &in,
+              const core::InputState &in,
               const FixedDelta &dt,
               const geometry::AABB &bounds);
 
@@ -47,11 +43,4 @@ private:
     MoveParams p_;
     MoveRuntime rt_;
 };
-
-// TODO(jyan): 유틸함수 정리
-static float clampf(float v, float a, float b)
-{
-    return (v < a) ? a : (v > b ? b : v);
-}
-
 } // namespace folio::movement

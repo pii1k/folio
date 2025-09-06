@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/geometry/types.hpp"
+#include "src/geometry/types.hpp"
 
 // TODO(jyan): 나중에 player로 ECS 분리. 지금은 Component만 추가함
 namespace folio::combat

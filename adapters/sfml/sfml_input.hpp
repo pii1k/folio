@@ -1,5 +1,5 @@
 #pragma once
-#include "game/movement/character_controller.hpp"
+#include "src/core/input.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window.hpp>
 
@@ -9,9 +9,9 @@ namespace folio::adapters
 class SfmlInput
 {
 public:
-    movement::InputState sample() const
+    core::InputState sample() const
     {
-        movement::InputState s{};
+        core::InputState s{};
         s.up = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
         s.down = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
         s.left = sf::Keyboard::isKeyPressed(sf::Keyboard::A);

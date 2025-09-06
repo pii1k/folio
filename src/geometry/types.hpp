@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics/Glsl.hpp>
 #include <algorithm>
 #include <cmath>
 

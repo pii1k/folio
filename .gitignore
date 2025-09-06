@@ -53,5 +53,4 @@ Thumbs.db
 
 # LSP
 compile_commands.json
-**/.clangd
 .cache
