@@ -27,8 +27,22 @@ target_include_directories(folio_combat INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(folio_world src/world/tile_map.cpp)
 target_include_directories(folio_world PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Sfml adapter
-find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
+include(FetchContent)
+set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
+set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
+set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
+set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
+set(SFML_BUILD_SYSTEM ON CACHE BOOL "" FORCE)
+set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.0.1
+)
+FetchContent_MakeAvailable(SFML)
+
 add_library(folio_adapters_sfml adapters/sfml/sfml_input.cpp)
 target_include_directories(folio_adapters_sfml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(folio_adapters_sfml
