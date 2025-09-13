@@ -13,17 +13,21 @@ public:
     core::InputState sample() const
     {
         core::InputState s{};
-        s.up = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
-        s.down = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
-        s.left = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-        s.right = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
-        s.dash = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
-                 sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
+        s.up = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
+               sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
+        s.down = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) ||
+                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
+        s.left = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
+                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+        s.right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
+                  sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+        s.dash = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) ||
+                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
         return s;
     }
     bool attackPressedEdge(bool &prev) const
     {
-        bool now = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+        bool now = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
         bool edge = now && !prev;
         prev = now;
         return edge;

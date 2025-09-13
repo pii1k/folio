@@ -14,15 +14,14 @@ void GameLoop::run(Game &game, const TickRates &rates)
 
     while (window_.isOpen())
     {
-        sf::Event e;
-        while (window_.pollEvent(e))
+        while (auto e = window_.pollEvent())
         {
-            if (e.type == sf::Event::Closed)
+            if (e->is<sf::Event::Closed>())
             {
                 window_.close();
                 break;
             }
-            game.event(ctx, e);
+            game.event(ctx, *e);
         }
 
         float frame = clock.restart().asSeconds();

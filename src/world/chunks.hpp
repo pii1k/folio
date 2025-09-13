@@ -72,6 +72,15 @@ public:
         });
     }
 
+    void invalidateTile(int tx, int ty)
+    {
+        const int cx = std::clamp(tx / chunk_, 0, std::max(1, (tile_map_.w + chunk_ - 1) / chunk_) - 1);
+        const int cy = std::clamp(ty / chunk_, 0, std::max(1, (tile_map_.h + chunk_ - 1) / chunk_) - 1);
+        ChunkKey key{cx, cy};
+        cache_.erase(key);
+        pending_.erase(key);
+    }
+
 private:
     void visibleRange(const sf::View &cam, auto &&fn) const
     {
@@ -133,7 +142,7 @@ private:
         const int ex = std::min(tile_map_.w, cx + chunk_);
         const int ey = std::min(tile_map_.h, cy + chunk_);
 
-        sf::VertexArray va(sf::Quads);
+        sf::VertexArray va(sf::PrimitiveType::Triangles);
         if (!isometric_)
         {
             for (int y = cy; y < ey; ++y)
@@ -145,10 +154,13 @@ private:
                                                      : sf::Color(46, 52, 64);
                     const float px = float(x * ts);
                     const float py = float(y * ts);
-                    va.append(sf::Vertex({px, py}, color));
-                    va.append(sf::Vertex({px + ts, py}, color));
-                    va.append(sf::Vertex({px + ts, py + ts}, color));
-                    va.append(sf::Vertex({px, py + ts}, color));
+                    // two triangles per tile
+                    va.append(sf::Vertex(sf::Vector2f{px, py}, color));
+                    va.append(sf::Vertex(sf::Vector2f{px + ts, py}, color));
+                    va.append(sf::Vertex(sf::Vector2f{px + ts, py + ts}, color));
+                    va.append(sf::Vertex(sf::Vector2f{px, py}, color));
+                    va.append(sf::Vertex(sf::Vector2f{px + ts, py + ts}, color));
+                    va.append(sf::Vertex(sf::Vector2f{px, py + ts}, color));
                 }
             }
         }
@@ -168,8 +180,11 @@ private:
                     sf::Vector2f p1{top.x + half_w, top.y + half_h};
                     sf::Vector2f p2{top.x, top.y + iso_.h};
                     sf::Vector2f p3{top.x - half_w, top.y + half_h};
+                    // two triangles to form a diamond
                     va.append(sf::Vertex(p0, color));
                     va.append(sf::Vertex(p1, color));
+                    va.append(sf::Vertex(p2, color));
+                    va.append(sf::Vertex(p0, color));
                     va.append(sf::Vertex(p2, color));
                     va.append(sf::Vertex(p3, color));
                 }

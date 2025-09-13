@@ -27,7 +27,7 @@ void DemoGame::init(app::AppContext &ctx)
     tr_.r = 12.f;
 
     // camera
-    cam_ = sf::View(sf::FloatRect(0, 0, 960, 540));
+    cam_ = sf::View(sf::FloatRect(sf::Vector2f{0.f, 0.f}, sf::Vector2f{960.f, 540.f}));
 
     // warm up chunks for initial view
     chunks_->appendVisibleRange(cam_, jobs_);
@@ -47,6 +47,31 @@ void DemoGame::fixedUpdate(app::AppContext &ctx, float dt)
     if (ctx.window)
     {
         facing_right_ = input_.facingRight(*ctx.window, tr_.pos.x);
+
+        // tile painting: LMB = place wall, RMB = erase
+        auto pix = sf::Mouse::getPosition(*ctx.window);
+        sf::Vector2i pi{pix.x, pix.y};
+        const auto isoP = ctx.window->mapPixelToCoords(pi, cam_);
+        const auto worldP = world::isoToWorld(isoP.x, isoP.y, map_.tile_size, iso_);
+        const int tx = std::clamp(int(std::floor(worldP.x / float(map_.tile_size))), 0, map_.w - 1);
+        const int ty = std::clamp(int(std::floor(worldP.y / float(map_.tile_size))), 0, map_.h - 1);
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            if (map_.tiles[ty * map_.w + tx] != 1)
+            {
+                map_.tiles[ty * map_.w + tx] = 1;
+                chunks_->invalidateTile(tx, ty);
+            }
+        }
+        else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+        {
+            if (map_.tiles[ty * map_.w + tx] != 0)
+            {
+                map_.tiles[ty * map_.w + tx] = 0;
+                chunks_->invalidateTile(tx, ty);
+            }
+        }
     }
 
     // map screen input to world-space direction for isometric equalized speed
@@ -98,7 +123,7 @@ void DemoGame::frameUpdate(app::AppContext &ctx, float ft)
     const float hh = cam_.getSize().y * 0.5f;
     const float cx = clampf(isoPos.x, iso_bounds_.x + hw, iso_bounds_.x + iso_bounds_.w - hw);
     const float cy = clampf(isoPos.y, iso_bounds_.y + hh, iso_bounds_.y + iso_bounds_.h - hh);
-    cam_.setCenter(cx, cy);
+    cam_.setCenter(sf::Vector2f{cx, cy});
 }
 
 void DemoGame::render(app::AppContext &ctx)
@@ -114,8 +139,8 @@ void DemoGame::render(app::AppContext &ctx)
     // draw player at projected isometric position
     const auto ip = world::worldToIso(tr_.pos.x, tr_.pos.y, map_.tile_size, iso_);
     sf::CircleShape pc(tr_.r, 18);
-    pc.setOrigin(tr_.r, tr_.r);
-    pc.setPosition(ip.x, ip.y);
+    pc.setOrigin(sf::Vector2f{tr_.r, tr_.r});
+    pc.setPosition(sf::Vector2f{ip.x, ip.y});
     pc.setFillColor(sf::Color(100, 200, 255));
     win.draw(pc);
 
@@ -123,12 +148,12 @@ void DemoGame::render(app::AppContext &ctx)
     sf::Vertex line[2] = {
         sf::Vertex(sf::Vector2f(tr_.pos.x, tr_.pos.y), sf::Color(200, 200, 200)),
         sf::Vertex(sf::Vector2f(tr_.pos.x + (facing_right_ ? 18.f : -18.f), tr_.pos.y), sf::Color(200, 200, 200))};
-    win.draw(line, 2, sf::Lines);
+    win.draw(line, 2, sf::PrimitiveType::Lines);
 
     // HUD
     win.setView(win.getDefaultView());
-    sf::RectangleShape bar({240.f, 10.f});
-    bar.setPosition(16.f, 16.f);
+    sf::RectangleShape bar(sf::Vector2f{240.f, 10.f});
+    bar.setPosition(sf::Vector2f{16.f, 16.f});
     bar.setFillColor(sf::Color(90, 200, 120));
     win.draw(bar);
 }

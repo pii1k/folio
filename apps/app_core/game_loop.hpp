@@ -11,7 +11,7 @@ class GameLoop
 {
 public:
     explicit GameLoop(const Config &cfg)
-        : window_(sf::VideoMode(cfg.width, cfg.height), cfg.title)
+        : window_(sf::VideoMode(sf::Vector2u{static_cast<unsigned>(cfg.width), static_cast<unsigned>(cfg.height)}), cfg.title)
     {
         window_.setFramerateLimit(cfg.frame_rate_limit);
         window_.setVerticalSyncEnabled(cfg.vsync);

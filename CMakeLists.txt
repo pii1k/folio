@@ -28,14 +28,14 @@ add_library(folio_world src/world/tile_map.cpp)
 target_include_directories(folio_world PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Sfml adapter
-find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
+find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
 add_library(folio_adapters_sfml adapters/sfml/sfml_input.cpp)
 target_include_directories(folio_adapters_sfml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(folio_adapters_sfml
 PUBLIC
-    sfml-graphics
-    sfml-window
-    sfml-system
+    SFML::Graphics
+    SFML::Window
+    SFML::System
 PRIVATE
     folio_core
 )
